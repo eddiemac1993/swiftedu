@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Registration - SwiftEdu</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+        }
+        .registration-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .registration-card h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+        .registration-card .form-control {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            margin-bottom: 1rem;
+        }
+        .registration-card .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+        }
+        .registration-card .btn-primary {
+            background: #667eea;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .registration-card .btn-primary:hover {
+            background: #5a6fd1;
+        }
+        .registration-card p {
+            margin-top: 1.5rem;
+            color: #666;
+        }
+        .registration-card a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .registration-card a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-card">
+        <h2>School Registration</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <input type="email" name="email" class="form-control" placeholder="Email" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password1" class="form-control" placeholder="Password" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password2" class="form-control" placeholder="Confirm Password" required>
+            </div>
+            <div class="mb-3">
+                <input type="text" name="name" class="form-control" placeholder="School Name" required>
+            </div>
+            <div class="mb-3">
+                <textarea name="address" class="form-control" placeholder="School Address" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+        <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+    </div>
+
+    <!-- Bootstrap 5 JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
