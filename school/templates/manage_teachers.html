@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %} Manage Teachers  | SwiftEdu{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="dashboard-card">
+        <h1>Manage Teachers</h1>
+        <p>View, add, edit, or delete teachers in your school.</p>
+    </div>
+
+    <!-- Add Teacher Button -->
+    <div class="dashboard-card">
+        <a href="{% url 'add_teacher' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Teacher
+        </a>
+    </div>
+
+    <!-- Teachers List -->
+    <div class="dashboard-card">
+        <h3>Teachers List</h3>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in teachers %}
+                <tr>
+                    <td>{{ teacher.first_name }} {{ teacher.last_name }}</td>
+                    <td>{{ teacher.user.email }}</td>
+                    <td>
+                        <a href="{% url 'edit_teacher' teacher.id %}" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        <a href="{% url 'delete_teacher' teacher.id %}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center">No teachers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

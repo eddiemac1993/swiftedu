@@ -1,0 +1,77 @@
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h3>SwiftEdu</h3>
+        <ul class="nav flex-column">
+            {% if request.user.user_type == 'school' %}
+                <!-- School Sidebar -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/school/dashboard/' %}active{% endif %}" href="{% url 'school_dashboard' %}">
+                        <i class="bi bi-house-door"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/manage-teachers/' %}active{% endif %}" href="{% url 'manage_teachers' %}">
+                        <i class="bi bi-person-badge"></i> Manage Teachers
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/manage-students/' %}active{% endif %}" href="{% url 'manage_students' %}">
+                        <i class="bi bi-people"></i> Manage Students
+                    </a>
+                </li>
+            {% elif request.user.user_type == 'teacher' %}
+                <!-- Teacher Sidebar -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/teacher/dashboard/' %}active{% endif %}" href="{% url 'teacher_dashboard' %}">
+                        <i class="bi bi-house-door"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/teacher/change-password/' %}active{% endif %}" href="{% url 'teacher_change_password' %}">
+                        <i class="bi bi-key"></i> Change Password
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-book"></i> My Classes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-file-earmark-text"></i> Reports
+                    </a>
+                </li>
+            {% elif request.user.user_type == 'student' %}
+                <!-- Student Sidebar -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/student/dashboard/' %}active{% endif %}" href="{% url 'student_dashboard' %}">
+                        <i class="bi bi-house-door"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/student/change-password/' %}active{% endif %}" href="{% url 'student_change_password' %}">
+                        <i class="bi bi-key"></i> Change Password
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-book"></i> My Courses
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-file-earmark-text"></i> Assignments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-bar-chart"></i> Grades
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+        <!-- Footer -->
+        <div class="sidebar-footer">
+            <p>&copy; 2025 SwiftEdu. All rights reserved.</p>
+        </div>
+    </div>

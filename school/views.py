@@ -1,12 +1,84 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render,get_object_or_404, redirect
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login,logout, authenticate
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group
-from .forms import SchoolRegistrationForm, AddTeacherForm, AddStudentForm, TeacherPasswordChangeForm
+from .forms import SchoolRegistrationForm, AddTeacherForm, AddStudentForm, TeacherPasswordChangeForm, StudentPasswordChangeForm
 from .models import User, School, Teacher, Student
+from django.core.mail import send_mail
+from django.conf import settings
 import random
 import string
+
+@login_required
+def delete_student(request, student_id):
+    student = get_object_or_404(Student, id=student_id, school=request.user.school)
+    student.user.delete()  # Delete the associated user
+    return redirect('manage_students')
+
+@login_required
+def edit_student(request, student_id):
+    student = get_object_or_404(Student, id=student_id, school=request.user.school)
+    if request.method == 'POST':
+        form = AddStudentForm(request.POST, instance=student.user)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_students')
+    else:
+        form = AddStudentForm(instance=student.user)
+    return render(request, 'edit_student.html', {'form': form})
+
+@login_required
+def manage_students(request):
+    # Ensure only schools can access this page
+    if request.user.user_type != 'school':
+        return redirect('login')
+
+    # Fetch all students associated with the logged-in school
+    school = request.user.school
+    students = Student.objects.filter(school=school)
+
+    return render(request, 'manage_students.html', {'students': students})
+
+@login_required
+def delete_teacher(request, teacher_id):
+    teacher = get_object_or_404(Teacher, id=teacher_id, school=request.user.school)
+    teacher.user.delete()  # Delete the associated user
+    return redirect('manage_teachers')
+
+@login_required
+def edit_teacher(request, teacher_id):
+    teacher = get_object_or_404(Teacher, id=teacher_id, school=request.user.school)
+    if request.method == 'POST':
+        form = AddTeacherForm(request.POST, instance=teacher.user)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_teachers')
+    else:
+        form = AddTeacherForm(instance=teacher.user)
+    return render(request, 'edit_teacher.html', {'form': form})
+
+@login_required
+def manage_teachers(request):
+    # Ensure only schools can access this page
+    if request.user.user_type != 'school':
+        return redirect('login')
+
+    # Fetch all teachers associated with the logged-in school
+    school = request.user.school
+    teachers = Teacher.objects.filter(school=school)
+
+    return render(request, 'manage_teachers.html', {'teachers': teachers})
+
+# Helper function to check user type
+def is_school(user):
+    return user.user_type == 'school'
+
+def is_teacher(user):
+    return user.user_type == 'teacher'
+
+def is_student(user):
+    return user.user_type == 'student'
 
 # School Registration View
 def school_register(request):
@@ -32,10 +104,8 @@ def school_register(request):
 
 # School Dashboard View
 @login_required
+@user_passes_test(is_school, login_url='login')
 def school_dashboard(request):
-    if request.user.user_type != 'school':
-        return redirect('login')
-
     school = request.user.school
     teachers = Teacher.objects.filter(school=school)
     students = Student.objects.filter(school=school)
@@ -46,14 +116,20 @@ def school_dashboard(request):
         'students': students,
     })
 
+
+# Teacher Dashboard View
 @login_required
+@user_passes_test(is_teacher, login_url='login')
 def teacher_dashboard(request):
     return render(request, 'teacher_dashboard.html')
 
+# Student Dashboard View
 @login_required
+@user_passes_test(is_student, login_url='login')
 def student_dashboard(request):
     return render(request, 'student_dashboard.html')
 
+# Login View
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -75,18 +151,9 @@ def login_view(request):
     return render(request, 'login.html', {'form': form})
 
 # Add Teacher View
-from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model
-from .forms import AddTeacherForm
-from .models import Teacher
-
-User = get_user_model()
-
 @login_required
+@user_passes_test(is_school, login_url='login')
 def add_teacher(request):
-    if request.user.user_type != 'school':
-        return redirect('login')
-
     if request.method == 'POST':
         form = AddTeacherForm(request.POST)
         if form.is_valid():
@@ -105,8 +172,14 @@ def add_teacher(request):
                 last_name=form.cleaned_data['last_name']
             )
 
-            # TODO: Send email to teacher with their credentials
-            print(f"Teacher created with email: {teacher_user.email} and password: {form.cleaned_data['password']}")
+            # Send email to teacher with their credentials
+            send_mail(
+                'Your account has been created',
+                f'Your email: {teacher_user.email}\nYour password: {form.cleaned_data["password"]}',
+                settings.EMAIL_HOST_USER,
+                [teacher_user.email],
+                fail_silently=False,
+            )
 
             return redirect('school_dashboard')
     else:
@@ -115,21 +188,19 @@ def add_teacher(request):
 
 # Add Student View
 @login_required
+@user_passes_test(is_school, login_url='login')
 def add_student(request):
-    if request.user.user_type != 'school':
-        return redirect('login')
-
     if request.method == 'POST':
         form = AddStudentForm(request.POST)
         if form.is_valid():
-            # Create User for Teacher
+            # Create User for Student
             student_user = User.objects.create_user(
                 email=form.cleaned_data['email'],
                 password=form.cleaned_data['password'],
                 user_type='student'
             )
 
-            # Create Teacher Profile
+            # Create Student Profile
             student = Student.objects.create(
                 user=student_user,
                 school=request.user.school,
@@ -137,20 +208,24 @@ def add_student(request):
                 last_name=form.cleaned_data['last_name']
             )
 
-            # TODO: Send email to teacher with their credentials
-            print(f"Student created with email: {student_user.email} and password: {form.cleaned_data['password']}")
+            # Send email to student with their credentials
+            send_mail(
+                'Your account has been created',
+                f'Your email: {student_user.email}\nYour password: {form.cleaned_data["password"]}',
+                settings.EMAIL_HOST_USER,
+                [student_user.email],
+                fail_silently=False,
+            )
 
             return redirect('school_dashboard')
     else:
-        form = AddTeacherForm()
+        form = AddStudentForm()
     return render(request, 'add_student.html', {'form': form})
 
 # Teacher Password Change View
 @login_required
+@user_passes_test(is_teacher, login_url='login')
 def teacher_change_password(request):
-    if request.user.user_type != 'teacher':
-        return redirect('login')
-
     if request.method == 'POST':
         form = TeacherPasswordChangeForm(request.user, request.POST)
         if form.is_valid():
@@ -160,11 +235,10 @@ def teacher_change_password(request):
         form = TeacherPasswordChangeForm(request.user)
     return render(request, 'teacher_change_password.html', {'form': form})
 
+# Student Password Change View
 @login_required
+@user_passes_test(is_student, login_url='login')
 def student_change_password(request):
-    if request.user.user_type != 'student':
-        return redirect('login')
-
     if request.method == 'POST':
         form = StudentPasswordChangeForm(request.user, request.POST)
         if form.is_valid():
@@ -173,3 +247,7 @@ def student_change_password(request):
     else:
         form = StudentPasswordChangeForm(request.user)
     return render(request, 'student_change_password.html', {'form': form})
+
+def custom_logout(request):
+    logout(request)
+    return redirect('login')
