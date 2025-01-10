@@ -9,6 +9,24 @@ from django.core.mail import send_mail
 from django.conf import settings
 import random
 import string
+from django.contrib import messages
+from .forms import ProfileUpdateForm
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated!')
+            return redirect('profile')
+    else:
+        form = ProfileUpdateForm(instance=request.user)
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'profile.html', context)
 
 @login_required
 def delete_student(request, student_id):

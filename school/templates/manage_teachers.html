@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %} Manage Teachers  | SwiftEdu{% endblock %}
+{% block title %}Manage Teachers | SwiftEdu{% endblock %}
 
 {% block content %}
     <!-- Page Header -->
@@ -16,37 +16,91 @@
         </a>
     </div>
 
+    <!-- Search Bar -->
+    <div class="dashboard-card">
+        <input type="text" id="searchBar" class="form-control" placeholder="Search by name or email...">
+    </div>
+
     <!-- Teachers List -->
     <div class="dashboard-card">
         <h3>Teachers List</h3>
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for teacher in teachers %}
-                <tr>
-                    <td>{{ teacher.first_name }} {{ teacher.last_name }}</td>
-                    <td>{{ teacher.user.email }}</td>
-                    <td>
-                        <a href="{% url 'edit_teacher' teacher.id %}" class="btn btn-sm btn-warning">
-                            <i class="bi bi-pencil"></i> Edit
-                        </a>
-                        <a href="{% url 'delete_teacher' teacher.id %}" class="btn btn-sm btn-danger">
-                            <i class="bi bi-trash"></i> Delete
-                        </a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="3" class="text-center">No teachers found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-hover" id="teachersTable">
+                <thead>
+                    <tr>
+                        <th>Profile Picture</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for teacher in teachers %}
+                    <tr class="teacher-row">
+                        <!-- Profile Picture -->
+                        <td>
+                            <img src="{% if teacher.user.profile_pic %}{{ teacher.user.profile_pic.url }}{% else %}/static/default_profile_pic.png{% endif %}" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; cursor: pointer;" class="profile-picture">
+                        </td>
+                        <!-- Name -->
+                        <td class="teacher-name">{{ teacher.first_name }} {{ teacher.last_name }}</td>
+                        <!-- Email -->
+                        <td class="teacher-email">{{ teacher.user.email }}</td>
+                        <!-- Actions -->
+                        <td>
+                            <a href="{% url 'edit_teacher' teacher.id %}" class="btn btn-sm btn-warning me-2">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <a href="{% url 'delete_teacher' teacher.id %}" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No teachers found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    <!-- Profile Picture Modal -->
+    <div class="modal fade" id="profilePictureModal" tabindex="-1" aria-labelledby="profilePictureModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <img id="modalProfilePicture" src="" alt="Profile Picture" style="width: 100%; border-radius: 10px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Search Bar and Profile Picture Modal -->
+    <script>
+        // Search Bar Functionality
+        document.getElementById('searchBar').addEventListener('input', function() {
+            const searchQuery = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.teacher-row');
+
+            rows.forEach(row => {
+                const name = row.querySelector('.teacher-name').textContent.toLowerCase();
+                const email = row.querySelector('.teacher-email').textContent.toLowerCase();
+
+                if (name.includes(searchQuery) || email.includes(searchQuery)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Profile Picture Modal
+        document.querySelectorAll('.profile-picture').forEach(img => {
+            img.addEventListener('click', function() {
+                document.getElementById('modalProfilePicture').src = this.src;
+                new bootstrap.Modal(document.getElementById('profilePictureModal')).show();
+            });
+        });
+    </script>
 {% endblock %}

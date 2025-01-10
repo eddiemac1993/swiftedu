@@ -5,7 +5,8 @@ urlpatterns = [
     # Authentication URLs (login/logout)
     path('', views.login_view, name='login'),  # Use custom login view
     path('logout/', views.custom_logout, name='logout'),
-    
+    path('profile/', views.profile, name='profile'),
+
     # Dashboard URLs
     path('school/dashboard/', views.school_dashboard, name='school_dashboard'),
     path('teacher/dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
@@ -19,7 +20,7 @@ urlpatterns = [
     # Teacher URLs
     path('teacher/change-password/', views.teacher_change_password, name='teacher_change_password'),
     path('student/change-password/', views.student_change_password, name='student_change_password'),
-    
+
     path('manage-teachers/', views.manage_teachers, name='manage_teachers'),
     path('edit-teacher/<int:teacher_id>/', views.edit_teacher, name='edit_teacher'),
     path('delete-teacher/<int:teacher_id>/', views.delete_teacher, name='delete_teacher'),

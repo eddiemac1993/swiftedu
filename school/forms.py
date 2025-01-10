@@ -1,6 +1,21 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from .models import User, School, Teacher, Student
+from django.contrib.auth import get_user_model
+from django.core.validators import RegexValidator
+
+User = get_user_model()
+
+class ProfileUpdateForm(forms.ModelForm):
+    phone_regex = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$',
+        message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
+    )
+    phone_number = forms.CharField(validators=[phone_regex], max_length=17, required=False)
+
+    class Meta:
+        model = User
+        fields = ['email', 'phone_number']
 
 # School Registration Form
 class SchoolRegistrationForm(UserCreationForm):
