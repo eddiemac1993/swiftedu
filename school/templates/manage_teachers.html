@@ -39,7 +39,7 @@
                     <tr class="teacher-row">
                         <!-- Profile Picture -->
                         <td>
-                            <img src="{% if teacher.user.profile_pic %}{{ teacher.user.profile_pic.url }}{% else %}/static/default_profile_pic.png{% endif %}" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; cursor: pointer;" class="profile-picture">
+                            <img src="{% if teacher.user.profile_pic %}{{ teacher.user.profile_pic.url }}{% else %}/static/default.jpg{% endif %}" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; cursor: pointer;" class="profile-picture">
                         </td>
                         <!-- Name -->
                         <td class="teacher-name">{{ teacher.first_name }} {{ teacher.last_name }}</td>

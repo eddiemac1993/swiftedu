@@ -1,10 +1,15 @@
+{% load static %}
 <!-- Sidebar -->
 <div class="sidebar">
     <h3>SwiftEdu</h3>
     <ul class="nav flex-column">
         <!-- Profile Picture and Name -->
         <div class="text-center mb-4">
-            <img id="profile-picture-preview" src="{{ request.user.profile_pic.url }}" alt="Profile Picture" style="width: 200px; height: 200px; border-radius: 50%;">
+                       {% if request.user.profile_pic %}
+                <img id="profile-picture-preview" src="{{ request.user.profile_pic.url }}" alt="Profile Picture" style="width: 200px; height: 200px; border-radius: 50%;">
+            {% else %}
+                <img id="profile-picture-preview" src="{% static 'default.jpg' %}" alt="Default Profile Picture" style="width: 200px; height: 200px; border-radius: 50%;">
+            {% endif %}
             <p class="mt-2">
                 Welcome,
                 {% if request.user.user_type == 'teacher' %}

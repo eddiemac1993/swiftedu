@@ -121,10 +121,6 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Media files (User uploads)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
 # If you have static files that are part of your app (like css, js, images)
 # and want to include them, you can add this:
 STATICFILES_DIRS = [
@@ -144,3 +140,11 @@ LOGIN_REDIRECT_URL = 'school_dashboard'
 # Set the login URL
 LOGIN_URL = 'login'
 
+
+# Email configuration for production
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'manjoloe800@gmail.com'
+EMAIL_HOST_PASSWORD = 'letloveleadbaju1993'

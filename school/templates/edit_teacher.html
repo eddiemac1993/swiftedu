@@ -6,26 +6,65 @@
     <!-- Edit Teacher Form -->
     <div class="dashboard-card">
         <h1>Edit Teacher</h1>
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
+            
+            <!-- Profile Picture -->
+            <div class="form-group text-center mb-4">
+                <img id="profile-picture-preview" src="{% if form.instance.profile_pic %}{{ form.instance.profile_pic.url }}{% else %}/static/default.jpg{% endif %}" alt="Profile Picture" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+                <div class="mt-2">
+                    <label for="id_profile_pic" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-camera"></i> Change Photo
+                    </label>
+                    <input type="file" name="profile_pic" id="id_profile_pic" class="d-none" onchange="previewProfilePicture(event)">
+                </div>
+            </div>
+
+            <!-- First Name -->
             <div class="form-group">
                 <label for="id_first_name">First Name</label>
                 <input type="text" name="first_name" id="id_first_name" class="form-control" value="{{ form.first_name.value }}" required>
             </div>
+
+            <!-- Last Name -->
             <div class="form-group">
                 <label for="id_last_name">Last Name</label>
                 <input type="text" name="last_name" id="id_last_name" class="form-control" value="{{ form.last_name.value }}" required>
             </div>
+
+            <!-- Email -->
             <div class="form-group">
                 <label for="id_email">Email</label>
                 <input type="email" name="email" id="id_email" class="form-control" value="{{ form.email.value }}" required>
             </div>
-            <button type="submit" class="btn btn-primary">
-                <i class="bi bi-save"></i> Save Changes
-            </button>
-            <a href="{% url 'manage_teachers' %}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Cancel
-            </a>
+
+            <!-- Phone Number -->
+            <div class="form-group">
+                <label for="id_phone_number">Phone Number</label>
+                <input type="text" name="phone_number" id="id_phone_number" class="form-control" value="{{ form.phone_number.value }}">
+            </div>
+
+            <!-- Save and Cancel Buttons -->
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save Changes
+                </button>
+                <a href="{% url 'manage_teachers' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Cancel
+                </a>
+            </div>
         </form>
     </div>
+
+    <!-- JavaScript for Profile Picture Preview -->
+    <script>
+        function previewProfilePicture(event) {
+            var reader = new FileReader();
+            reader.onload = function() {
+                var output = document.getElementById('profile-picture-preview');
+                output.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
 {% endblock %}

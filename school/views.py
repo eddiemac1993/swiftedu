@@ -139,7 +139,26 @@ def school_dashboard(request):
 @login_required
 @user_passes_test(is_teacher, login_url='login')
 def teacher_dashboard(request):
-    return render(request, 'teacher_dashboard.html')
+    # Get the logged-in user
+    user = request.user
+
+    # Get the teacher profile associated with the user
+    try:
+        teacher = Teacher.objects.get(user=user)
+    except Teacher.DoesNotExist:
+        # Handle the case where the teacher profile does not exist
+        teacher = None
+
+    # Get the profile picture URL (handle cases where it's missing)
+    profile_pic_url = user.profile_pic.url if user.profile_pic else None
+
+    # Pass context to the template
+    context = {
+        'teacher': teacher,
+        'profile_pic_url': profile_pic_url,
+    }
+
+    return render(request, 'teacher_dashboard.html', context)
 
 # Student Dashboard View
 @login_required
