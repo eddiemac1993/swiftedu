@@ -1,0 +1,11 @@
+<!-- templates/create_grade.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Create Grade</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Create Grade</button>
+</form>
+{% endblock %}

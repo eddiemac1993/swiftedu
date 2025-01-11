@@ -14,19 +14,53 @@
         <div class="col-md-6">
             <div class="dashboard-card">
                 <h3>Quick Actions</h3>
-                <a href="{% url 'add_teacher' %}" class="btn btn-primary w-100 mb-2">Add Teacher</a>
-                <a href="{% url 'add_student' %}" class="btn btn-primary w-100">Add Student</a>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'add_teacher' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-person-plus"></i> Add Teacher
+                    </a>
+                    <a href="{% url 'add_student' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-person-plus"></i> Add Student
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
-<div class="dashboard-card">
-    <h3>Teachers</h3>
-    <p>Total Teachers: <span class="badge bg-primary">{{ teachers.count }}</span></p>
-</div>
+    <!-- Teachers and Students Summary -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h3>Teachers</h3>
+                <p>Total Teachers: <span class="badge bg-primary">{{ teachers.count }}</span></p>
+                <a href="{% url 'manage_teachers' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-people"></i> View All Teachers
+                </a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h3>Students</h3>
+                <p>Total Students: <span class="badge bg-success">{{ students.count }}</span></p>
+                <a href="{% url 'manage_students' %}" class="btn btn-outline-success">
+                    <i class="bi bi-people"></i> View All Students
+                </a>
+            </div>
+        </div>
+    </div>
 
-<div class="dashboard-card">
-    <h3>Students</h3>
-    <p>Total Students: <span class="badge bg-success">{{ students.count }}</span></p>
-</div>
+    <!-- Recent Activity (Optional) -->
+    <div class="dashboard-card">
+        <h3>Recent Activity</h3>
+        <ul class="list-group">
+            <li class="list-group-item">
+                <i class="bi bi-person-plus"></i> Added a new teacher: John Doe
+            </li>
+            <li class="list-group-item">
+                <i class="bi bi-person-plus"></i> Added a new student: Jane Smith
+            </li>
+            <li class="list-group-item">
+                <i class="bi bi-pencil"></i> Updated teacher profile: Sarah Johnson
+            </li>
+        </ul>
+    </div>
 {% endblock %}

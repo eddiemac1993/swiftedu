@@ -1,0 +1,27 @@
+<!-- templates/grade_list.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Grades</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Class Teacher</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for grade in grades %}
+        <tr>
+            <td>{{ grade.name }}</td>
+            <td>{{ grade.class_teacher }}</td>
+            <td>
+                <a href="{% url 'grade_detail' grade.id %}" class="btn btn-sm btn-info">View Details</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'create_grade' %}" class="btn btn-primary">Create New Grade</a>
+{% endblock %}

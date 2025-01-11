@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import RegexValidator
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Custom User Manager
 class CustomUserManager(BaseUserManager):
@@ -51,8 +56,17 @@ class User(AbstractUser):
     def __str__(self):
         return self.email
 
+    def save(self, *args, **kwargs):
+        if not self.user_type or self.user_type not in dict(self.USER_TYPE_CHOICES).keys():
+            raise ValueError("Invalid or missing user_type")
+        super().save(*args, **kwargs)
+
 # School Model
 class School(models.Model):
+    """
+    Represents a school in the system.
+    Each school is linked to a User with user_type='school'.
+    """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='school')
     name = models.CharField(max_length=100)
     address = models.TextField()
@@ -70,6 +84,15 @@ class Teacher(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'school'], name='unique_teacher_school')
+        ]
+
 # Student Model
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student')
@@ -79,3 +102,37 @@ class Student(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'school'], name='unique_student_school')
+        ]
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        try:
+            if instance.user_type == 'school':
+                School.objects.create(user=instance)
+            elif instance.user_type == 'teacher':
+                Teacher.objects.create(user=instance)
+            elif instance.user_type == 'student':
+                Student.objects.create(user=instance)
+        except Exception as e:
+            logger.error(f"Error creating profile: {e}")
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    try:
+        if instance.user_type == 'school' and hasattr(instance, 'school'):
+            instance.school.save()
+        elif instance.user_type == 'teacher' and hasattr(instance, 'teacher'):
+            instance.teacher.save()
+        elif instance.user_type == 'student' and hasattr(instance, 'student'):
+            instance.student.save()
+    except Exception as e:
+        logger.error(f"Error saving profile: {e}")

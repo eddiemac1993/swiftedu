@@ -1,0 +1,28 @@
+<!-- templates/grade_detail.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ grade.name }}</h1>
+
+<!-- Grade Actions -->
+<div class="mb-4">
+    <a href="{% url 'assign_class_teacher' grade.id %}" class="btn btn-primary">Assign Class Teacher</a>
+    <a href="{% url 'create_course' grade.id %}" class="btn btn-primary">Create Course</a>
+</div>
+
+<!-- Grade Details -->
+<div class="card">
+    <div class="card-header">
+        <h2>Grade Details</h2>
+    </div>
+    <div class="card-body">
+        <p><strong>Class Teacher:</strong> {{ grade.class_teacher }}</p>
+        <p><strong>Courses:</strong></p>
+        <ul>
+            {% for course in grade.courses.all %}
+            <li>{{ course.subject.name }} (Taught by: {{ course.teacher }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

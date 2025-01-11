@@ -12,6 +12,14 @@ import string
 from django.contrib import messages
 from .forms import ProfileUpdateForm
 
+def send_welcome_email(email):
+    subject = 'Welcome to Our Platform'
+    message = 'Thank you for joining us!'
+    from_email = 'edwardmanjolo9@gmail.com'
+    recipient_list = [email]
+
+    send_mail(subject, message, from_email, recipient_list)
+
 @login_required
 def profile(request):
     if request.method == 'POST':
@@ -194,33 +202,35 @@ def add_teacher(request):
     if request.method == 'POST':
         form = AddTeacherForm(request.POST)
         if form.is_valid():
+            email = form.cleaned_data['email']
+
+            # Check if the email already exists
+            if User.objects.filter(email=email).exists():
+                messages.error(request, 'A user with this email already exists.')
+                return redirect('add_teacher')  # Redirect back to the form
+
             # Create User for Teacher
             teacher_user = User.objects.create_user(
-                email=form.cleaned_data['email'],
+                email=email,
                 password=form.cleaned_data['password'],
                 user_type='teacher'
             )
 
             # Create Teacher Profile
-            teacher = Teacher.objects.create(
+            school = request.user.school  # Assuming the logged-in user is a school
+            Teacher.objects.create(
                 user=teacher_user,
-                school=request.user.school,
+                school=school,
                 first_name=form.cleaned_data['first_name'],
                 last_name=form.cleaned_data['last_name']
             )
 
-            # Send email to teacher with their credentials
-            send_mail(
-                'Your account has been created',
-                f'Your email: {teacher_user.email}\nYour password: {form.cleaned_data["password"]}',
-                settings.EMAIL_HOST_USER,
-                [teacher_user.email],
-                fail_silently=False,
-            )
+            messages.success(request, 'Teacher added successfully.')
+            return redirect('school_dashboard')  # Redirect to the list of teachers
 
-            return redirect('school_dashboard')
     else:
         form = AddTeacherForm()
+
     return render(request, 'add_teacher.html', {'form': form})
 
 # Add Student View

@@ -3,6 +3,15 @@
 {% block title %}Add Teacher - SwiftEdu{% endblock %}
 
 {% block content %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <!-- Add Teacher Form -->
     <div class="form-container">
         <h2>Add Teacher</h2>
